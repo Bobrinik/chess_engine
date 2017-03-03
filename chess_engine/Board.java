@@ -7,6 +7,7 @@ import java.util.ArrayList;
  * @author bobrin
  *
  */
+
 public class Board {
 	private int turn = 0;
 	private Square boardSquares[][];
@@ -54,6 +55,18 @@ public class Board {
 			Piece rook = new Rook(color, boardSquares[row][column]);
 			boardSquares[row][column].put(rook);
 			return rook;
+		case "knight":
+			Piece knight = new Knight(color, boardSquares[row][column]);
+			boardSquares[row][column].put(knight);
+			return knight;
+		case "bishop":
+			Piece bishop = new Bishop(color, boardSquares[row][column]);
+			boardSquares[row][column].put(bishop);
+			return bishop;
+		case  "queen":
+			Piece queen = new Queen(color, boardSquares[row][column]);
+			boardSquares[row][column].put(queen);
+			return queen;
 		default:
 			System.out.println("The piece that you asked is not implemented");
 			return null;
@@ -292,7 +305,7 @@ public class Board {
 				}		
 			}
 
-			if(isWithinABoard(row-1, column)){
+			if(isWithinABoard(row-1, column+1)){
 				if(!this.getSquare(row-1, column+1).isEmpty()){
 					if(this.getSquare(row-1, column+1).getPiece().getColor() != color){
 						if(this.getSquare(row-1, column+1).getPiece().isIt("pawn")){

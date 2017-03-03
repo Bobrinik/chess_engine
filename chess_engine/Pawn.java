@@ -8,36 +8,27 @@ import java.util.ArrayList;
  * @author bobrin
  *
  */
-public class Pawn implements Piece{
-	private final String name= "pawn";
-	private Square currentLocation;
-	private Color color;
+public class Pawn extends Piece{
 	private int jumpedTwoOnTurn;
-	private final static int score = 1; 
 
 	public Pawn(Color color, Square location){
-		this.updateLocation(location);
-		this.color = color;
+		super(color, location, "pawn");
 	}
 
-
-	public void updateLocation(Square location){
-		this.currentLocation = location;		
-	}
 
 	@Override
 	public ArrayList<Move> getMoves() {
 		ArrayList<Move> possibleMoves = new ArrayList<>();
-		int column = currentLocation.getColumn();
-		Board brd = currentLocation.getBoard();
-		addEnpassantMoves(possibleMoves, brd,currentLocation.getRow(), column);
-		addJumpTwoSquaresMove(possibleMoves,brd, currentLocation.getRow(),column);
-		if(this.color == Color.White){
-			int next_row =  currentLocation.getRow()+1;
+		int column = getCurrentLocation().getColumn();
+		Board brd = getCurrentLocation().getBoard();
+		addEnpassantMoves(possibleMoves, brd, getCurrentLocation().getRow(), column);
+		addJumpTwoSquaresMove(possibleMoves,brd, getCurrentLocation().getRow(),column);
+		if(this.getColor() == Color.White){
+			int next_row =  getCurrentLocation().getRow()+1;
 			generatePawnMoves(possibleMoves, column, brd, next_row);
 		}
 		else{
-			int next_row =  currentLocation.getRow()-1;
+			int next_row =  getCurrentLocation().getRow()-1;
 			generatePawnMoves(possibleMoves, column, brd, next_row);			
 		}
 		return possibleMoves;
@@ -46,22 +37,22 @@ public class Pawn implements Piece{
 
 	//verify logic step by step
 	private void addEnpassantMoves(ArrayList<Move> possibleMoves, Board brd, int row, int column) {
-		int row_of_possible_enemy = this.currentLocation.getRow();
-		int column_of_possible_enemy = this.currentLocation.getColumn();
-		if(this.currentLocation.getColumn() != 0 && this.currentLocation.getColumn() != 7){
+		int row_of_possible_enemy = this.getCurrentLocation().getRow();
+		int column_of_possible_enemy = this.getCurrentLocation().getColumn();
+		if(this.getCurrentLocation().getColumn() != 0 && this.getCurrentLocation().getColumn() != 7){
 			addEnpassantMove(possibleMoves, brd, row_of_possible_enemy, column_of_possible_enemy-1);
 			addEnpassantMove(possibleMoves, brd, row_of_possible_enemy, column_of_possible_enemy+1);
 		}
-		else if(this.currentLocation.getColumn() == 0){
-			addEnpassantMove(possibleMoves, brd, this.currentLocation.getRow(), this.currentLocation.getColumn()+1);
+		else if(this.getCurrentLocation().getColumn() == 0){
+			addEnpassantMove(possibleMoves, brd, this.getCurrentLocation().getRow(), this.getCurrentLocation().getColumn()+1);
 		}
 		else{
-			addEnpassantMove(possibleMoves, brd, this.currentLocation.getRow(), this.currentLocation.getColumn()-1);
+			addEnpassantMove(possibleMoves, brd, this.getCurrentLocation().getRow(), this.getCurrentLocation().getColumn()-1);
 		}
 	}
 
 	private void addEnpassantMove(ArrayList<Move> possibleMoves, Board brd, int row_enemy, int column_enemy) {
-		if(this.color == Color.White && this.currentLocation.getRow() == 4){
+		if(this.getColor() == Color.White && this.getCurrentLocation().getRow() == 4){
 			if(isEnemyPawnPresent(row_enemy,column_enemy)){
 				Pawn enemy_pawn = (Pawn) brd.getSquare(row_enemy, column_enemy).getPiece();
 				if(enemyPawnJumpedTwoOneTurnAgo(brd, enemy_pawn)){
@@ -69,7 +60,7 @@ public class Pawn implements Piece{
 				}
 			}	
 		}
-		else if(this.color == Color.Black && this.currentLocation.getRow() == 3){
+		else if(this.getColor() == Color.Black && this.getCurrentLocation().getRow() == 3){
 			if(isEnemyPawnPresent(row_enemy,column_enemy)){
 				Pawn enemy_pawn = (Pawn) brd.getSquare(row_enemy, column_enemy).getPiece();
 				if(enemyPawnJumpedTwoOneTurnAgo(brd, enemy_pawn)){
@@ -86,7 +77,7 @@ public class Pawn implements Piece{
 
 
 	private boolean isEnemyPawnPresent(int row, int column) {
-		Board brd = this.currentLocation.getBoard();
+		Board brd = this.getCurrentLocation().getBoard();
 		Square sqr = brd.getSquare(row, column);
 		if(sqr.isEmpty()){
 			return false;
@@ -113,15 +104,13 @@ public class Pawn implements Piece{
 		}
 	}
 
-
-
 	private void addJumpTwoSquaresMove(ArrayList<Move> possibleMoves, Board brd, int row, int column) {
-		if(row == 1 && this.color == Color.White){
+		if(row == 1 && this.getColor() == Color.White){
 			if(!isPiecePresent(brd, row+1, column) && !isPiecePresent(brd, row+2, column)){
 				possibleMoves.add(new Move(brd.getSquare(row+2, column),MoveType.Regular));
 			}
 		}
-		else if(row == 6 && this.color == Color.Black){
+		else if(row == 6 && this.getColor() == Color.Black){
 			if(!isPiecePresent(brd, row-1, column) && !isPiecePresent(brd, row-2, column)){
 				possibleMoves.add(new Move(brd.getSquare(row-2, column), MoveType.Regular));
 			}
@@ -146,41 +135,18 @@ public class Pawn implements Piece{
 		}
 	}
 
-
-
 	public boolean isPieceEnemy(Piece piece) {
-		return piece.getColor() != this.color;
+		return piece.getColor() != this.getColor();
 	}
-
-
 
 	private boolean isPiecePresent(Board brd, int row, int column) {
 		return !brd.getSquare(row, column).isEmpty();
 	}
 
-
 	public String toString(){
-		if(this.color == color.White){
-			return "\u2659";
-		}
-		else{
-			return "\u265F";
-		}
+		return (this.getColor() == Color.White)? "\u2659":"\u265F";
 	}
 
-	@Override
-	public Color getColor(){
-		return this.color;
-	}
-	public static int getScore(){
-		return score;
-	}
-
-
-	@Override
-	public String getName() {
-		return this.name;
-	}
 
 	public void setJumpOccuredOnTurn(int turn){
 		this.jumpedTwoOnTurn = turn;
@@ -188,11 +154,5 @@ public class Pawn implements Piece{
 
 	public int getjumpedTwoOnTurn(){
 		return this.jumpedTwoOnTurn;
-	}
-
-
-	@Override
-	public boolean isIt(String pieceName) {
-		return this.name.compareTo(pieceName) == 0;
 	}
 }
